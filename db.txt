@@ -1,0 +1,163 @@
+CREATE TABLE admins (
+  id VARCHAR(36) PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(150) NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMP NOT NULL DEFAULT now()
+);
+
+
+CREATE TABLE employees (
+  id VARCHAR(36) PRIMARY KEY,
+  nik VARCHAR(30) NOT NULL UNIQUE,
+  name VARCHAR(150) NOT NULL,
+  spcd VARCHAR(10) NOT NULL,
+  spname VARCHAR(150) NOT NULL,
+  email VARCHAR(150),
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMP NOT NULL DEFAULT now()
+);
+
+
+CREATE TABLE exams (
+  id VARCHAR(36) PRIMARY KEY,
+  title VARCHAR(150) NOT NULL,
+  description TEXT,
+  duration_minutes INT NOT NULL CHECK (duration_minutes > 0),
+  start_at TIMESTAMP,
+  end_at TIMESTAMP,
+  created_by VARCHAR(36) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT now(),
+
+  CONSTRAINT fk_exam_admin
+    FOREIGN KEY (created_by)
+    REFERENCES admins(id)
+    ON DELETE RESTRICT,
+
+  CONSTRAINT chk_exam_time
+    CHECK (end_at IS NULL OR start_at IS NULL OR end_at > start_at)
+);
+
+
+
+CREATE TABLE questions (
+  id VARCHAR(36) PRIMARY KEY,
+  exam_id VARCHAR(36) NOT NULL,
+  question_text TEXT NOT NULL,
+  score INT NOT NULL DEFAULT 1 CHECK (score >= 0),
+  order_no INT NOT NULL,
+
+  CONSTRAINT fk_question_exam
+    FOREIGN KEY (exam_id)
+    REFERENCES exams(id)
+    ON DELETE CASCADE,
+
+  CONSTRAINT uq_exam_question_order
+    UNIQUE (exam_id, order_no)
+);
+
+
+
+CREATE TABLE options (
+  id VARCHAR(36) PRIMARY KEY,
+  question_id VARCHAR(36) NOT NULL,
+  label VARCHAR(5) NOT NULL,
+  text TEXT NOT NULL,
+  is_correct BOOLEAN NOT NULL DEFAULT false,
+
+  CONSTRAINT fk_option_question
+    FOREIGN KEY (question_id)
+    REFERENCES questions(id)
+    ON DELETE CASCADE,
+
+  CONSTRAINT uq_question_label
+    UNIQUE (question_id, label)
+);
+
+
+
+CREATE TABLE invitations (
+  id VARCHAR(36) PRIMARY KEY,
+  exam_id VARCHAR(36) NOT NULL,
+  employee_id VARCHAR(36) NOT NULL,
+  email VARCHAR(150) NOT NULL,
+  token VARCHAR(100) NOT NULL UNIQUE,
+  status VARCHAR(20) NOT NULL DEFAULT 'sent',
+  expired_at TIMESTAMP,
+  created_at TIMESTAMP NOT NULL DEFAULT now(),
+
+  CONSTRAINT fk_inv_exam
+    FOREIGN KEY (exam_id)
+    REFERENCES exams(id)
+    ON DELETE CASCADE,
+
+  CONSTRAINT fk_inv_employee
+    FOREIGN KEY (employee_id)
+    REFERENCES employees(id)
+    ON DELETE RESTRICT,
+
+  CONSTRAINT uq_exam_employee
+    UNIQUE (exam_id, employee_id),
+
+  CONSTRAINT chk_inv_status
+    CHECK (status IN ('sent', 'opened', 'completed'))
+);
+
+
+
+CREATE TABLE exam_attempts (
+  id VARCHAR(36) PRIMARY KEY,
+  exam_id VARCHAR(36) NOT NULL,
+  invitation_id VARCHAR(36) NOT NULL UNIQUE,
+  started_at TIMESTAMP,
+  finished_at TIMESTAMP,
+  total_score INT NOT NULL DEFAULT 0 CHECK (total_score >= 0),
+
+  CONSTRAINT fk_attempt_exam
+    FOREIGN KEY (exam_id)
+    REFERENCES exams(id)
+    ON DELETE CASCADE,
+
+  CONSTRAINT fk_attempt_invitation
+    FOREIGN KEY (invitation_id)
+    REFERENCES invitations(id)
+    ON DELETE CASCADE,
+
+  CONSTRAINT chk_attempt_time
+    CHECK (
+      finished_at IS NULL
+      OR started_at IS NULL
+      OR finished_at >= started_at
+    )
+);
+
+
+
+CREATE TABLE answers (
+  id VARCHAR(36) PRIMARY KEY,
+  attempt_id VARCHAR(36) NOT NULL,
+  question_id VARCHAR(36) NOT NULL,
+  selected_option_id VARCHAR(36) NOT NULL,
+  is_correct BOOLEAN NOT NULL,
+  score INT NOT NULL DEFAULT 0 CHECK (score >= 0),
+
+  CONSTRAINT fk_answer_attempt
+    FOREIGN KEY (attempt_id)
+    REFERENCES exam_attempts(id)
+    ON DELETE CASCADE,
+
+  CONSTRAINT fk_answer_question
+    FOREIGN KEY (question_id)
+    REFERENCES questions(id)
+    ON DELETE CASCADE,
+
+  CONSTRAINT fk_answer_option
+    FOREIGN KEY (selected_option_id)
+    REFERENCES options(id)
+    ON DELETE RESTRICT,
+
+  CONSTRAINT uq_attempt_question
+    UNIQUE (attempt_id, question_id)
+);
+
