@@ -23,6 +23,17 @@ const EmployeeRepository = {
     return result.rows[0] || null;
   },
 
+  findAll: async () => {
+    const query = `
+      SELECT *
+      FROM employees
+      WHERE is_active = true
+      ORDER BY nik ASC
+    `;
+    const result = await db.query(query);
+    return result.rows || [];
+  },
+
   create: async (employee) => {
     const query = `
       INSERT INTO employees (

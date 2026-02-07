@@ -32,6 +32,22 @@ class EmployeeController {
       });
     }
   }
+
+  static async getAll(req, res) {
+    try {
+      const employees = await EmployeeService.getAll();
+
+      return res.json({
+        success: true,
+        data: employees
+      });
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        message: err.message
+      });
+    }
+  }
 }
 
 module.exports = EmployeeController;

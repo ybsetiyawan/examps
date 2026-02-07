@@ -11,7 +11,30 @@ const questionParticipantRoutes = require('./api/routes/questionParticipant.rout
 const answerRoutes = require('./api/routes/answer.routes');
 const resultRoutes = require('./api/routes/result.routes');
 
+const cors = require("cors");
 const app = express();
+if (process.env.APP_CORS_ENABLE === "true") {
+  const corsOptions = {
+    origin: process.env.APP_CORS_ALLOWED_ORIGINS.split(","),
+    methods: process.env.APP_CORS_ALLOWED_METHODS,
+    allowedHeaders: process.env.APP_CORS_ALLOWED_HEADERS,
+    credentials: process.env.APP_CORS_ALLOW_CREDENTIALS === "true",
+    maxAge: parseInt(process.env.APP_CORS_MAX_AGE_SECONDS, 10),
+  };
+
+  app.use(cors(corsOptions)); // ✅ INI YANG PERLU DITAMBAHKAN
+  console.log("✅ CORS enabled with options:", corsOptions);
+} else {
+  console.log("❌ CORS disabled");
+}
+// app.use(
+//   cors({
+//     origin: process.env.APP_CORS_ALLOWED_ORIGINS.split(","), // Sesuaikan dengan URL frontend Anda
+//     credentials: true,
+//     methods: process.env.APP_CORS_ALLOWED_METHODS,
+//     allowedHeaders: process.env.APP_CORS_ALLOWED_HEADERS,
+//   })
+// );
 
 app.use(express.json());
 app.use('/api/employees', employeeRoutes);

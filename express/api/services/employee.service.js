@@ -32,6 +32,10 @@ const EmployeeService = {
       throw new Error('Karyawan tidak ditemukan');
     }
     return employee;
+  },
+
+  getAll: async () => {
+    return EmployeeRepo.findAll();
   }
 };
 
