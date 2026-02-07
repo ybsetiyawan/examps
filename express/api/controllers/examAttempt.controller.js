@@ -23,10 +23,10 @@ const ExamAttemptController = {
 
   finish: async (req, res, next) => {
     try {
-      const { attempt_id } = req.body;
+      const invitation = req.invitation; // dari participantAuth
 
       const result =
-        await ExamAttemptService.finish(attempt_id);
+        await ExamAttemptService.finish(invitation);
 
       res.json({
         success: true,
