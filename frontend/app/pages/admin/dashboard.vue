@@ -4,12 +4,7 @@
       <div v-if="ready">
         <h1>Dashboard Admin</h1>
         <p>Selamat datang di panel admin.</p>
-
-        <v-btn color="error" @click="handleLogout">
-          Logout
-        </v-btn>
       </div>
-
       <div v-else>
         <v-progress-circular indeterminate color="primary" />
       </div>
@@ -42,7 +37,7 @@ onMounted(() => {
   ready.value = true;
 });
 
-function handleLogout() {
-  logout();
-}
+// function handleLogout() {
+//   logout();
+// }
 </script>

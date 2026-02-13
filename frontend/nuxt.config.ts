@@ -10,7 +10,9 @@ export default defineNuxtConfig({
     ],
   ],
 
-  css: ["vuetify/styles", "@mdi/font/css/materialdesignicons.css"],
+  css: [
+      "vuetify/styles",
+      "@mdi/font/css/materialdesignicons.css"],
 
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
@@ -18,8 +20,13 @@ export default defineNuxtConfig({
   devServer: {
     port: 8090,
       host: "0.0.0.0",   
-      url: "http://172.24.231.111:8090", 
+      // url: "http://10.126.101.217:8090", 
          // <-- TAMBAHKAN INI
+  },
+  runtimeConfig: {
+    public: {
+      apiBase: process.env.NUXT_PUBLIC_API_BASE,
+    },
   },
 
   

@@ -20,7 +20,23 @@ const OptionRepo = {
 
     const { rows } = await db.query(query, values);
     return rows[0];
-  }
+  },
+  
+findByQuestionId: async (questionId) => {
+  const result = await db.query(
+    `
+    SELECT *
+    FROM options
+    WHERE question_id = $1
+    ORDER BY label ASC
+    `,
+    [questionId]
+  );
+
+  return result.rows || [];
+},
+
 };
+
 
 module.exports = OptionRepo;

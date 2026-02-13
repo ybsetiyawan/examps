@@ -27,9 +27,9 @@ import { useRouter } from "#imports";
 import { useAuth } from "~~/app/composables/useAuth";
 import { adminLogin } from "~~/services/api";
 
-definePageMeta({
-  layout: "admin",
-});
+// definePageMeta({
+//   layout: "admin",
+// });
 
 const router = useRouter();
 const { isAuthenticated } = useAuth();
@@ -49,11 +49,15 @@ async function handleLogin() {
   try {
     loading.value = true;
     error.value = "";
+const data = await adminLogin(email.value, password.value);
 
-    const data = await adminLogin(email.value, password.value);
+// console.log("RAW LOGIN RESPONSE:", data);
+// console.log("TOKEN YANG AKAN DISIMPAN:", data.data.token);
 
-    // Simpan token di localStorage
-    localStorage.setItem("admin_token", data.token);
+// Simpan token di localStorage
+localStorage.setItem("admin_token", data.data.token);
+
+router.push("/admin/dashboard");
 
     // Redirect ke dashboard
     router.push("/admin/dashboard");

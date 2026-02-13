@@ -28,6 +28,14 @@ const AnswerRepo = {
     return result.rows[0];
   },
 
+  findByQuestionId: async (examId) => {
+    const result = await db.query(
+      "SELECT * FROM answer WHERE exam_id = $1 ORDER BY order_no ASC",
+      [examId],
+    );
+    return result.rows || [];
+  },
+
   findByAttemptAndQuestion: async (attempt_id, question_id) => {
     const query = `
       SELECT *

@@ -18,7 +18,16 @@ const OptionService = {
     };
 
     return OptionRepo.create(option);
+  },
+
+  getByQuestionId: async (questionId) => {
+  if (!questionId) {
+    throw new Error('questionId wajib diisi');
   }
+
+  return await OptionRepo.findByQuestionId(questionId);
+},
+
 };
 
 module.exports = OptionService;

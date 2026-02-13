@@ -17,6 +17,24 @@ class OptionController {
       });
     }
   }
+
+
+  static async getByQuestion(req, res, next) {
+  try {
+    const { questionId } = req.params;
+
+    const options =
+      await OptionService.getByQuestionId(questionId);
+
+    return res.json({
+      success: true,
+      data: options,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 }
 
 module.exports = OptionController;
